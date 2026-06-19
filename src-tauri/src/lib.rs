@@ -258,6 +258,16 @@ fn rename_session(file_path: String, session_id: String, new_title: String) -> R
     Ok(())
 }
 
+/// Open a directory in Finder.
+#[tauri::command]
+fn open_in_finder(path: String) -> Result<(), String> {
+    Command::new("open")
+        .arg(&path)
+        .spawn()
+        .map_err(|e| format!("Could not open Finder: {e}"))?;
+    Ok(())
+}
+
 /// Open a directory in VS Code. Uses the `code` CLI when available, otherwise
 /// falls back to macOS `open -a`.
 #[tauri::command]
@@ -342,6 +352,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             list_sessions,
             rename_session,
+            open_in_finder,
             open_in_vscode,
             get_favorites,
             set_favorite

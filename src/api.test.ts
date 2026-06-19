@@ -13,6 +13,7 @@ vi.mock("@tauri-apps/plugin-clipboard-manager", () => ({
 import {
   listSessions,
   renameSession,
+  openInFinder,
   openInVscode,
   getFavorites,
   setFavorite,
@@ -39,6 +40,13 @@ describe("api", () => {
       filePath: "/tmp/x.jsonl",
       sessionId: "sid-1",
       newTitle: "New Title",
+    });
+  });
+
+  it("openInFinder passes a path arg", async () => {
+    await openInFinder("/Users/me/proj");
+    expect(invoke).toHaveBeenCalledWith("open_in_finder", {
+      path: "/Users/me/proj",
     });
   });
 

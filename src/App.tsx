@@ -3,6 +3,7 @@ import {
   copyResumeCommand,
   getFavorites,
   listSessions,
+  openInFinder,
   openInVscode,
   renameSession,
   setFavorite,
@@ -110,6 +111,18 @@ export default function App() {
     [showToast],
   );
 
+  const onFinder = useCallback(
+    async (s: Session) => {
+      if (!s.cwd) return;
+      try {
+        await openInFinder(s.cwd);
+      } catch (e) {
+        showToast(`Could not open Finder: ${e}`);
+      }
+    },
+    [showToast],
+  );
+
   const onVscode = useCallback(
     async (s: Session) => {
       if (!s.cwd) return;
@@ -173,6 +186,7 @@ export default function App() {
                 onToggleFavorite={onToggleFavorite}
                 onRename={onRename}
                 onResume={onResume}
+                onFinder={onFinder}
                 onVscode={onVscode}
               />
             ))}

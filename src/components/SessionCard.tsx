@@ -8,6 +8,7 @@ interface Props {
   onToggleFavorite: (s: Session) => void;
   onRename: (s: Session, title: string) => Promise<void>;
   onResume: (s: Session) => void;
+  onFinder: (s: Session) => void;
   onVscode: (s: Session) => void;
 }
 
@@ -17,6 +18,7 @@ export function SessionCard({
   onToggleFavorite,
   onRename,
   onResume,
+  onFinder,
   onVscode,
 }: Props) {
   const [editing, setEditing] = useState(false);
@@ -114,6 +116,13 @@ export function SessionCard({
       <div className="card-actions">
         <button onClick={() => onResume(session)} title="Copy resume command">
           Copy resume
+        </button>
+        <button
+          onClick={() => onFinder(session)}
+          disabled={!session.cwd}
+          title={session.cwd ?? "No working directory"}
+        >
+          Open Finder
         </button>
         <button
           onClick={() => onVscode(session)}

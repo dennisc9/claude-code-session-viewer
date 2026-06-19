@@ -14,6 +14,10 @@ export function renameSession(
   return invoke("rename_session", { filePath, sessionId, newTitle });
 }
 
+export function openInFinder(path: string): Promise<void> {
+  return invoke("open_in_finder", { path });
+}
+
 export function openInVscode(path: string): Promise<void> {
   return invoke("open_in_vscode", { path });
 }

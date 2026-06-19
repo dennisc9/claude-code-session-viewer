@@ -25,6 +25,8 @@ Run the relevant suite(s) after any change, plus `npm run build` to typecheck. T
 
 When you change something, run the matching suite: touch `lib.rs` → `cargo test`; touch anything under `src/` → `npm test`. Both must stay green.
 
+**Every new feature must include tests.** New IPC commands get a test in `src/api.test.ts` verifying the command name and camelCase argument shape. New UI interactions (buttons, handlers) get tests in the relevant `*.test.tsx` covering the enabled/disabled state and the callback being fired.
+
 **Never edit a test just to make it pass.** A failing test means the code regressed — fix the code, not the assertion. Only change a test when the behavior it checks was *intentionally* changed (and say so explicitly); otherwise treat a red test as a real bug to investigate, not an obstacle to silence. The frontend filter/sort logic is intentionally extracted into the pure `src/filter.ts` so it can be tested without rendering `App.tsx` — keep that logic there rather than re-inlining it into the `useMemo`. Favorites read/write logic lives in the pure `read_favorites`/`write_favorite` helpers (the `AppHandle`-bound commands just call them) so it stays unit-testable — keep that split.
 
 ## Architecture

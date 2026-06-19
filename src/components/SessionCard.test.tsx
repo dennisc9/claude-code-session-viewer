@@ -9,6 +9,7 @@ function setup(sessionOverrides = {}) {
     onToggleFavorite: vi.fn(),
     onRename: vi.fn().mockResolvedValue(undefined),
     onResume: vi.fn(),
+    onFinder: vi.fn(),
     onVscode: vi.fn(),
   };
   const session = makeSession(sessionOverrides);
@@ -19,6 +20,7 @@ function setup(sessionOverrides = {}) {
       onToggleFavorite={handlers.onToggleFavorite}
       onRename={handlers.onRename}
       onResume={handlers.onResume}
+      onFinder={handlers.onFinder}
       onVscode={handlers.onVscode}
     />,
   );
@@ -58,6 +60,20 @@ describe("SessionCard", () => {
     const { onResume, session } = setup();
     await user.click(screen.getByRole("button", { name: "Copy resume" }));
     expect(onResume).toHaveBeenCalledWith(session);
+  });
+
+  it("calls onFinder with the session when there is a cwd", async () => {
+    const user = userEvent.setup();
+    const { onFinder, session } = setup({ cwd: "/Users/me/proj" });
+    const btn = screen.getByRole("button", { name: "Open Finder" });
+    expect(btn).toBeEnabled();
+    await user.click(btn);
+    expect(onFinder).toHaveBeenCalledWith(session);
+  });
+
+  it("disables Open Finder when the session has no cwd", () => {
+    setup({ cwd: null });
+    expect(screen.getByRole("button", { name: "Open Finder" })).toBeDisabled();
   });
 
   it("calls onVscode with the session when there is a cwd", async () => {
