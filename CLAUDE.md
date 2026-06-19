@@ -13,7 +13,19 @@ session-file contract, and the IPC command surface.
 - `npm run build` — `tsc` typecheck + Vite build of the frontend only (no Rust); use this to verify the TS compiles
 - `npm run dev` — Vite dev server only; the app's IPC calls fail without the Tauri shell, so prefer `tauri dev`
 
-There is no test suite or linter configured. Verify changes by running `npm run build` (typecheck) and `npm run tauri dev`.
+## Tests
+
+Run the relevant suite(s) after any change, plus `npm run build` to typecheck. There is no linter.
+
+- `npm test` — frontend unit/component tests once (Vitest + React Testing Library, jsdom). `npm run test:watch` for watch mode.
+  - Covers `src/format.ts`, `src/filter.ts` (the extracted filter/sort/search logic), the `components/`, and the `src/api.ts` IPC argument contract. Tests live next to the code as `*.test.ts(x)`; shared helpers/setup are in `src/test/`.
+- `cd src-tauri && cargo test` — Rust backend tests in the `#[cfg(test)]` module at the bottom of `lib.rs`.
+  - `cargo`/`rustc` are installed via rustup and may not be on a fresh shell's PATH — run `. "$HOME/.cargo/env"` first if `cargo` isn't found.
+  - File-touching tests use the `tempfile` dev-dependency and never read or write real `~/.claude` data.
+
+When you change something, run the matching suite: touch `lib.rs` → `cargo test`; touch anything under `src/` → `npm test`. Both must stay green.
+
+**Never edit a test just to make it pass.** A failing test means the code regressed — fix the code, not the assertion. Only change a test when the behavior it checks was *intentionally* changed (and say so explicitly); otherwise treat a red test as a real bug to investigate, not an obstacle to silence. The frontend filter/sort logic is intentionally extracted into the pure `src/filter.ts` so it can be tested without rendering `App.tsx` — keep that logic there rather than re-inlining it into the `useMemo`. Favorites read/write logic lives in the pure `read_favorites`/`write_favorite` helpers (the `AppHandle`-bound commands just call them) so it stays unit-testable — keep that split.
 
 ## Architecture
 

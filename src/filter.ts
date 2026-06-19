@@ -1,0 +1,47 @@
+/** Pure filter/sort/search logic for the session list, extracted from App.tsx
+ *  so it can be unit-tested without rendering the component. */
+import type { Session, SortKey } from "./types";
+import type { Filter } from "./components/Sidebar";
+
+export interface FilterOptions {
+  /** Free-text query matched against name + first + last message. */
+  search: string;
+  /** Active sidebar filter (all / favorites / a project dir). */
+  filter: Filter;
+  /** Set of favorited session ids. */
+  favorites: Set<string>;
+  /** Which timestamp to sort by; always newest-first. */
+  sortKey: SortKey;
+}
+
+/** Apply the favorites/project filter, the search query, and the sort.
+ *  Returns a new array; the input is never mutated. */
+export function filterSortSessions(
+  sessions: Session[],
+  { search, filter, favorites, sortKey }: FilterOptions,
+): Session[] {
+  const q = search.trim().toLowerCase();
+  let list = sessions;
+
+  if (filter.type === "favorites") {
+    list = list.filter((s) => favorites.has(s.id));
+  } else if (filter.type === "project") {
+    list = list.filter((s) => s.projectDir === filter.dir);
+  }
+
+  if (q) {
+    list = list.filter((s) => {
+      const haystack = [s.name, s.firstMessage, s.lastMessage]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }
+
+  return [...list].sort((a, b) => {
+    const av = (sortKey === "created" ? a.created : a.lastActive) ?? "";
+    const bv = (sortKey === "created" ? b.created : b.lastActive) ?? "";
+    return bv.localeCompare(av); // newest first
+  });
+}

@@ -8,6 +8,7 @@ import {
   setFavorite,
 } from "./api";
 import type { Session, SortKey } from "./types";
+import { filterSortSessions } from "./filter";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
 import "./App.css";
@@ -64,32 +65,10 @@ export default function App() {
     return [...map.values()].sort((a, b) => a.label.localeCompare(b.label));
   }, [sessions]);
 
-  const visible = useMemo(() => {
-    const q = search.trim().toLowerCase();
-    let list = sessions;
-
-    if (filter.type === "favorites") {
-      list = list.filter((s) => favorites.has(s.id));
-    } else if (filter.type === "project") {
-      list = list.filter((s) => s.projectDir === filter.dir);
-    }
-
-    if (q) {
-      list = list.filter((s) => {
-        const haystack = [s.name, s.firstMessage, s.lastMessage]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase();
-        return haystack.includes(q);
-      });
-    }
-
-    return [...list].sort((a, b) => {
-      const av = (sortKey === "created" ? a.created : a.lastActive) ?? "";
-      const bv = (sortKey === "created" ? b.created : b.lastActive) ?? "";
-      return bv.localeCompare(av); // newest first
-    });
-  }, [sessions, favorites, filter, search, sortKey]);
+  const visible = useMemo(
+    () => filterSortSessions(sessions, { search, filter, favorites, sortKey }),
+    [sessions, favorites, filter, search, sortKey],
+  );
 
   const onToggleFavorite = useCallback(
     async (s: Session) => {

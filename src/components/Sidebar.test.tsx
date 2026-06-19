@@ -1,0 +1,72 @@
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { Sidebar, type Filter, type ProjectGroup } from "./Sidebar";
+
+const projects: ProjectGroup[] = [
+  { dir: "-Users-me-alpha", label: "alpha", count: 3 },
+  { dir: "-Users-me-beta", label: "beta", count: 1 },
+];
+
+function setup(filter: Filter = { type: "all" }) {
+  const onSelect = vi.fn();
+  render(
+    <Sidebar
+      projects={projects}
+      totalCount={4}
+      favoritesCount={2}
+      filter={filter}
+      onSelect={onSelect}
+    />,
+  );
+  return { onSelect };
+}
+
+describe("Sidebar", () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it("renders the All and Favorites counts", () => {
+    setup();
+    expect(screen.getByText("All sessions").parentElement).toHaveTextContent("4");
+    expect(screen.getByText("★ Favorites").parentElement).toHaveTextContent("2");
+  });
+
+  it("renders one nav item per project with its count", () => {
+    setup();
+    expect(screen.getByText("alpha").parentElement).toHaveTextContent("3");
+    expect(screen.getByText("beta").parentElement).toHaveTextContent("1");
+  });
+
+  it("calls onSelect with the all filter", async () => {
+    const user = userEvent.setup();
+    const { onSelect } = setup({ type: "favorites" });
+    await user.click(screen.getByText("All sessions"));
+    expect(onSelect).toHaveBeenCalledWith({ type: "all" });
+  });
+
+  it("calls onSelect with the favorites filter", async () => {
+    const user = userEvent.setup();
+    const { onSelect } = setup();
+    await user.click(screen.getByText("★ Favorites"));
+    expect(onSelect).toHaveBeenCalledWith({ type: "favorites" });
+  });
+
+  it("calls onSelect with a project filter carrying the dir", async () => {
+    const user = userEvent.setup();
+    const { onSelect } = setup();
+    await user.click(screen.getByText("alpha"));
+    expect(onSelect).toHaveBeenCalledWith({
+      type: "project",
+      dir: "-Users-me-alpha",
+    });
+  });
+
+  it("marks the active filter button with the active class", () => {
+    setup({ type: "project", dir: "-Users-me-beta" });
+    expect(screen.getByText("beta").closest("button")).toHaveClass("active");
+    expect(screen.getByText("alpha").closest("button")).not.toHaveClass("active");
+    expect(
+      screen.getByText("All sessions").closest("button"),
+    ).not.toHaveClass("active");
+  });
+});

@@ -291,16 +291,37 @@ fn favorites_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     Ok(dir.join("favorites.json"))
 }
 
-/// Read the set of favorited session ids from app data.
-#[tauri::command]
-fn get_favorites(app: tauri::AppHandle) -> Result<Vec<String>, String> {
-    let path = favorites_path(&app)?;
+/// Read favorited session ids from a `favorites.json` at `path`. Missing or
+/// malformed files yield an empty set rather than an error.
+fn read_favorites(path: &Path) -> Result<Vec<String>, String> {
     if !path.exists() {
         return Ok(Vec::new());
     }
-    let data = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-    let ids: Vec<String> = serde_json::from_str(&data).unwrap_or_default();
-    Ok(ids)
+    let data = fs::read_to_string(path).map_err(|e| e.to_string())?;
+    Ok(serde_json::from_str(&data).unwrap_or_default())
+}
+
+/// Toggle a session id in the `favorites.json` at `path` and persist the full,
+/// sorted set. Returns the updated set.
+fn write_favorite(path: &Path, session_id: &str, favorite: bool) -> Result<Vec<String>, String> {
+    let mut ids: BTreeSet<String> = read_favorites(path)?.into_iter().collect();
+
+    if favorite {
+        ids.insert(session_id.to_string());
+    } else {
+        ids.remove(session_id);
+    }
+
+    let out: Vec<String> = ids.into_iter().collect();
+    fs::write(path, serde_json::to_string(&out).map_err(|e| e.to_string())?)
+        .map_err(|e| e.to_string())?;
+    Ok(out)
+}
+
+/// Read the set of favorited session ids from app data.
+#[tauri::command]
+fn get_favorites(app: tauri::AppHandle) -> Result<Vec<String>, String> {
+    read_favorites(&favorites_path(&app)?)
 }
 
 /// Toggle a session's favorite state and persist the full set.
@@ -310,27 +331,7 @@ fn set_favorite(
     session_id: String,
     favorite: bool,
 ) -> Result<Vec<String>, String> {
-    let path = favorites_path(&app)?;
-    let mut ids: BTreeSet<String> = if path.exists() {
-        let data = fs::read_to_string(&path).map_err(|e| e.to_string())?;
-        serde_json::from_str::<Vec<String>>(&data)
-            .unwrap_or_default()
-            .into_iter()
-            .collect()
-    } else {
-        BTreeSet::new()
-    };
-
-    if favorite {
-        ids.insert(session_id);
-    } else {
-        ids.remove(&session_id);
-    }
-
-    let out: Vec<String> = ids.into_iter().collect();
-    fs::write(&path, serde_json::to_string(&out).map_err(|e| e.to_string())?)
-        .map_err(|e| e.to_string())?;
-    Ok(out)
+    write_favorite(&favorites_path(&app)?, &session_id, favorite)
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -347,4 +348,252 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+    use tempfile::{NamedTempFile, TempDir};
+
+    // ---- extract_text -------------------------------------------------------
+
+    #[test]
+    fn extract_text_plain_string() {
+        assert_eq!(
+            extract_text(&json!("hello world")),
+            Some("hello world".to_string())
+        );
+    }
+
+    #[test]
+    fn extract_text_trims_and_drops_blank_strings() {
+        assert_eq!(extract_text(&json!("  spaced  ")), Some("spaced".to_string()));
+        assert_eq!(extract_text(&json!("   ")), None);
+        assert_eq!(extract_text(&json!("")), None);
+    }
+
+    #[test]
+    fn extract_text_joins_text_blocks_and_ignores_others() {
+        let content = json!([
+            { "type": "text", "text": "first" },
+            { "type": "tool_use", "name": "Bash", "input": {} },
+            { "type": "tool_result", "content": "ignored" },
+            { "type": "text", "text": "second" },
+        ]);
+        assert_eq!(extract_text(&content), Some("first\nsecond".to_string()));
+    }
+
+    #[test]
+    fn extract_text_array_with_no_text_blocks_is_none() {
+        let content = json!([{ "type": "tool_result", "content": "x" }]);
+        assert_eq!(extract_text(&content), None);
+    }
+
+    #[test]
+    fn extract_text_non_string_non_array_is_none() {
+        assert_eq!(extract_text(&json!(42)), None);
+        assert_eq!(extract_text(&json!(null)), None);
+    }
+
+    // ---- parse_session ------------------------------------------------------
+
+    /// Write `lines` (already-serialized JSONL strings) to a temp `.jsonl` file
+    /// whose stem is a fixed UUID, then parse it.
+    fn parse_lines(lines: &[&str]) -> Session {
+        let dir = TempDir::new().unwrap();
+        let path = dir
+            .path()
+            .join("11111111-2222-3333-4444-555555555555.jsonl");
+        let mut f = fs::File::create(&path).unwrap();
+        for l in lines {
+            writeln!(f, "{l}").unwrap();
+        }
+        f.flush().unwrap();
+        parse_session(&path, "-Users-me-proj").expect("session should parse")
+    }
+
+    #[test]
+    fn parse_session_id_comes_from_filename() {
+        let s = parse_lines(&[]);
+        assert_eq!(s.id, "11111111-2222-3333-4444-555555555555");
+    }
+
+    #[test]
+    fn parse_session_last_ai_title_and_last_prompt_win() {
+        let s = parse_lines(&[
+            r#"{"type":"ai-title","aiTitle":"first title"}"#,
+            r#"{"type":"last-prompt","lastPrompt":"first prompt"}"#,
+            r#"{"type":"ai-title","aiTitle":"second title"}"#,
+            r#"{"type":"last-prompt","lastPrompt":"final prompt"}"#,
+        ]);
+        assert_eq!(s.name.as_deref(), Some("second title"));
+        assert_eq!(s.last_message.as_deref(), Some("final prompt"));
+    }
+
+    #[test]
+    fn parse_session_sums_assistant_tokens() {
+        let s = parse_lines(&[
+            r#"{"type":"assistant","message":{"model":"claude-opus-4-7","usage":{"input_tokens":10,"output_tokens":5}}}"#,
+            r#"{"type":"assistant","message":{"model":"claude-sonnet-4-6","usage":{"input_tokens":100,"output_tokens":50}}}"#,
+        ]);
+        assert_eq!(s.total_tokens, 165);
+        // model = last seen assistant model.
+        assert_eq!(s.model.as_deref(), Some("claude-sonnet-4-6"));
+    }
+
+    #[test]
+    fn parse_session_missing_usage_fields_default_to_zero() {
+        let s = parse_lines(&[
+            r#"{"type":"assistant","message":{"usage":{"input_tokens":7}}}"#,
+        ]);
+        assert_eq!(s.total_tokens, 7);
+    }
+
+    #[test]
+    fn parse_session_message_count_takes_last_turn_duration() {
+        let s = parse_lines(&[
+            r#"{"type":"system","subtype":"turn_duration","messageCount":2}"#,
+            r#"{"type":"system","subtype":"other","messageCount":999}"#,
+            r#"{"type":"system","subtype":"turn_duration","messageCount":8}"#,
+        ]);
+        assert_eq!(s.message_count, Some(8));
+    }
+
+    #[test]
+    fn parse_session_created_and_last_active_timestamps() {
+        let s = parse_lines(&[
+            r#"{"type":"user","cwd":"/Users/me/proj","timestamp":"2026-01-01T00:00:00Z","message":{"content":"hi"}}"#,
+            r#"{"type":"assistant","timestamp":"2026-01-01T00:00:05Z","message":{"usage":{"input_tokens":1,"output_tokens":1}}}"#,
+            r#"{"type":"last-prompt","lastPrompt":"bye","timestamp":"2026-01-02T12:00:00Z"}"#,
+        ]);
+        // created = first user message with text; last_active = last timestamp anywhere.
+        assert_eq!(s.created.as_deref(), Some("2026-01-01T00:00:00Z"));
+        assert_eq!(s.last_active.as_deref(), Some("2026-01-02T12:00:00Z"));
+        assert_eq!(s.first_message.as_deref(), Some("hi"));
+        assert_eq!(s.cwd.as_deref(), Some("/Users/me/proj"));
+    }
+
+    #[test]
+    fn parse_session_created_skips_blank_first_user_message() {
+        let s = parse_lines(&[
+            r#"{"type":"user","cwd":"/Users/me/proj","timestamp":"2026-01-01T00:00:00Z","message":{"content":"   "}}"#,
+            r#"{"type":"user","timestamp":"2026-01-01T00:00:09Z","message":{"content":"real first"}}"#,
+        ]);
+        assert_eq!(s.first_message.as_deref(), Some("real first"));
+        assert_eq!(s.created.as_deref(), Some("2026-01-01T00:00:09Z"));
+    }
+
+    #[test]
+    fn parse_session_project_label_prefers_cwd_basename() {
+        let s = parse_lines(&[
+            r#"{"type":"user","cwd":"/Users/me/code/my-app","message":{"content":"hi"}}"#,
+        ]);
+        assert_eq!(s.project_label, "my-app");
+    }
+
+    #[test]
+    fn parse_session_project_label_falls_back_to_dir_segment() {
+        // No cwd anywhere -> fall back to last `-` segment of the project dir.
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("abc.jsonl");
+        fs::File::create(&path).unwrap();
+        let s = parse_session(&path, "-Users-me-Tess-finance").unwrap();
+        assert_eq!(s.project_label, "finance");
+        assert_eq!(s.cwd, None);
+    }
+
+    #[test]
+    fn parse_session_skips_blank_and_malformed_lines() {
+        let s = parse_lines(&[
+            r#"{"type":"ai-title","aiTitle":"good"}"#,
+            "",
+            "   ",
+            "{ this is not json",
+            r#"{"type":"last-prompt","lastPrompt":"still parsed"}"#,
+        ]);
+        assert_eq!(s.name.as_deref(), Some("good"));
+        assert_eq!(s.last_message.as_deref(), Some("still parsed"));
+    }
+
+    // ---- rename_session -----------------------------------------------------
+
+    #[test]
+    fn rename_session_appends_without_destroying_history() {
+        let mut tmp = NamedTempFile::new().unwrap();
+        writeln!(tmp, r#"{{"type":"ai-title","aiTitle":"old"}}"#).unwrap();
+        writeln!(tmp, r#"{{"type":"user","message":{{"content":"hi"}}}}"#).unwrap();
+        tmp.flush().unwrap();
+        let path = tmp.path().to_path_buf();
+
+        rename_session(
+            path.to_string_lossy().to_string(),
+            "sid-123".to_string(),
+            "new name".to_string(),
+        )
+        .unwrap();
+
+        let contents = fs::read_to_string(&path).unwrap();
+        let lines: Vec<&str> = contents.lines().collect();
+        // Original two lines preserved, one appended.
+        assert_eq!(lines.len(), 3);
+        assert!(lines[0].contains("\"old\""));
+        let appended: Value = serde_json::from_str(lines[2]).unwrap();
+        assert_eq!(appended["type"], "ai-title");
+        assert_eq!(appended["aiTitle"], "new name");
+        assert_eq!(appended["sessionId"], "sid-123");
+
+        // Parser now reports the appended (last) title.
+        let parsed = parse_session(&path, "-proj").unwrap();
+        assert_eq!(parsed.name.as_deref(), Some("new name"));
+    }
+
+    #[test]
+    fn rename_session_errors_on_missing_file() {
+        let err = rename_session(
+            "/no/such/file.jsonl".to_string(),
+            "sid".to_string(),
+            "x".to_string(),
+        )
+        .unwrap_err();
+        assert!(err.contains("not found"));
+    }
+
+    // ---- favorites ----------------------------------------------------------
+
+    #[test]
+    fn read_favorites_missing_file_is_empty() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("favorites.json");
+        assert_eq!(read_favorites(&path).unwrap(), Vec::<String>::new());
+    }
+
+    #[test]
+    fn write_favorite_round_trips_add_and_remove() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("favorites.json");
+
+        let after_add = write_favorite(&path, "b", true).unwrap();
+        assert_eq!(after_add, vec!["b"]);
+        // Sorted set: adding "a" puts it ahead of "b".
+        let after_second = write_favorite(&path, "a", true).unwrap();
+        assert_eq!(after_second, vec!["a", "b"]);
+        // Persisted to disk between calls.
+        assert_eq!(read_favorites(&path).unwrap(), vec!["a", "b"]);
+
+        let after_remove = write_favorite(&path, "a", false).unwrap();
+        assert_eq!(after_remove, vec!["b"]);
+    }
+
+    #[test]
+    fn write_favorite_is_idempotent() {
+        let dir = TempDir::new().unwrap();
+        let path = dir.path().join("favorites.json");
+        write_favorite(&path, "x", true).unwrap();
+        let twice = write_favorite(&path, "x", true).unwrap();
+        assert_eq!(twice, vec!["x"]);
+        // Removing something absent is a no-op, not an error.
+        let removed = write_favorite(&path, "absent", false).unwrap();
+        assert_eq!(removed, vec!["x"]);
+    }
 }
