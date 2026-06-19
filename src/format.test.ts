@@ -10,12 +10,18 @@ describe("formatTokens", () => {
   it("renders thousands with a k suffix", () => {
     expect(formatTokens(1000)).toBe("1.0k");
     expect(formatTokens(1500)).toBe("1.5k");
-    expect(formatTokens(999_999)).toBe("1000.0k");
+    expect(formatTokens(999_000)).toBe("999.0k");
   });
 
   it("renders millions with an M suffix", () => {
     expect(formatTokens(1_000_000)).toBe("1.0M");
     expect(formatTokens(2_500_000)).toBe("2.5M");
+  });
+
+  it("promotes the k→M rounding seam instead of showing 1000.0k", () => {
+    expect(formatTokens(999_999)).toBe("1.0M");
+    expect(formatTokens(999_950)).toBe("1.0M");
+    expect(formatTokens(999_949)).toBe("999.9k");
   });
 });
 
