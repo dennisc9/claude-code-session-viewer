@@ -33,12 +33,14 @@ Rust backend and the React frontend. For the product spec and feature scope, see
 
 - **No database.** Every launch re-scans `~/.claude/projects/` and parses each `.jsonl` from scratch.
   Filtering, sorting, and search all happen client-side in `App.tsx` over the in-memory list.
-- **Favorites are the one piece of state with no native Claude equivalent.** They persist as a JSON
-  array of session ids in `favorites.json` inside the Tauri app-data dir. The location is resolved at
-  runtime via `app.path().app_data_dir()`, which Tauri maps to the per-user, per-OS data directory
-  (e.g. `~/Library/Application Support/<identifier>/` on macOS, `%APPDATA%\<identifier>\` on Windows,
-  `~/.local/share/<identifier>/` on Linux). `<identifier>` is the `identifier` set in `tauri.conf.json`.
-  Never hardcode this path — always resolve it through Tauri.
+- **Favorites are the one piece of state with no native Claude equivalent.** They persist as JSON
+  arrays inside the Tauri app-data dir: session-id favorites in `favorites.json`, and favorited
+  project dirs (which pin a project to the top of the sidebar) in `favorite_projects.json`. Both files
+  share the same read/write helpers (`read_favorites`/`write_favorite`), which operate on any string-id
+  set. The location is resolved at runtime via `app.path().app_data_dir()`, which Tauri maps to the
+  per-user, per-OS data directory (e.g. `~/Library/Application Support/<identifier>/` on macOS,
+  `%APPDATA%\<identifier>\` on Windows, `~/.local/share/<identifier>/` on Linux). `<identifier>` is the
+  `identifier` set in `tauri.conf.json`. Never hardcode this path — always resolve it through Tauri.
 
 ## Session file format (the read contract)
 
@@ -90,6 +92,8 @@ at the bottom of that file, and wrapped with typed functions in `src/api.ts`.
 | `open_in_vscode`   | `path`                                    | —                | Open a folder in VS Code (CLI, then `open -a`).     |
 | `get_favorites`    | —                                         | `string[]`       | Read favorited session ids from app data.           |
 | `set_favorite`     | `sessionId`, `favorite`                   | `string[]`       | Toggle and persist; returns the full updated set.   |
+| `get_favorite_projects` | —                                    | `string[]`       | Read favorited project dirs from app data.          |
+| `set_favorite_project`  | `projectDir`, `favorite`             | `string[]`       | Toggle and persist; returns the full updated set.   |
 
 `copyResumeCommand` (in `api.ts`) is **not** a Rust command — it writes `claude --resume <id>` to the
 clipboard via the clipboard-manager plugin directly from the frontend.

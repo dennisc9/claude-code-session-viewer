@@ -1,7 +1,22 @@
 /** Pure filter/sort/search logic for the session list, extracted from App.tsx
  *  so it can be unit-tested without rendering the component. */
 import type { Session, SortKey } from "./types";
-import type { Filter } from "./components/Sidebar";
+import type { Filter, ProjectGroup } from "./components/Sidebar";
+
+/** Order the sidebar projects: favorited ones first (each group keeping its
+ *  alphabetical order), so favorites are pinned to the top of the list.
+ *  Returns a new array; the input is never mutated. */
+export function sortProjects(
+  projects: ProjectGroup[],
+  favoriteProjects: Set<string>,
+): ProjectGroup[] {
+  return [...projects].sort((a, b) => {
+    const af = favoriteProjects.has(a.dir);
+    const bf = favoriteProjects.has(b.dir);
+    if (af !== bf) return af ? -1 : 1;
+    return a.label.localeCompare(b.label);
+  });
+}
 
 export interface FilterOptions {
   /** Free-text query matched against name + first + last message. */

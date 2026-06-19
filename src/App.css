@@ -113,11 +113,24 @@ body {
   min-height: 0;
 }
 
+/* Draggable divider between the sidebar and the content area. The visible
+   line is 1px but the hit target is wider for easier grabbing. */
+.resizer {
+  width: 5px;
+  flex-shrink: 0;
+  cursor: col-resize;
+  background: var(--border);
+  transition: background 0.12s ease;
+}
+.resizer:hover,
+.resizer:active {
+  background: var(--accent);
+}
+
 .sidebar {
   width: 220px;
   flex-shrink: 0;
   background: var(--bg-elev);
-  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -154,6 +167,27 @@ body {
   text-align: left;
   cursor: pointer;
   width: 100%;
+}
+
+/* A project row: a star toggle plus the nav button (which fills the row). */
+.project-row {
+  display: flex;
+  align-items: center;
+}
+.project-row .nav-item {
+  flex: 1;
+  min-width: 0;
+  padding-left: 4px;
+}
+.project-row .project-star {
+  font-size: 13px;
+  padding: 6px 4px 6px 14px;
+  flex-shrink: 0;
+  visibility: hidden;
+}
+.project-row:hover .project-star,
+.project-row .project-star.starred {
+  visibility: visible;
 }
 .nav-item:hover {
   background: var(--bg-hover);

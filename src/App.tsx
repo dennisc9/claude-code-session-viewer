@@ -1,15 +1,18 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   copyResumeCommand,
+  getFavoriteProjects,
   getFavorites,
   listSessions,
   openInFinder,
   openInVscode,
   renameSession,
   setFavorite,
+  setFavoriteProject,
 } from "./api";
 import type { Session, SortKey } from "./types";
-import { filterSortSessions } from "./filter";
+import { filterSortSessions, sortProjects } from "./filter";
+import { clampSidebarWidth, loadSidebarWidth, saveSidebarWidth } from "./layout";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
 import "./App.css";
@@ -17,6 +20,9 @@ import "./App.css";
 export default function App() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
+  const [favoriteProjects, setFavoriteProjects] = useState<Set<string>>(
+    new Set(),
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -24,14 +30,22 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>({ type: "all" });
   const [sortKey, setSortKey] = useState<SortKey>("lastActive");
+  const [sidebarWidth, setSidebarWidth] = useState(loadSidebarWidth);
+  const sidebarWidthRef = useRef(sidebarWidth);
+  sidebarWidthRef.current = sidebarWidth;
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const [s, favs] = await Promise.all([listSessions(), getFavorites()]);
+      const [s, favs, projFavs] = await Promise.all([
+        listSessions(),
+        getFavorites(),
+        getFavoriteProjects(),
+      ]);
       setSessions(s);
       setFavorites(new Set(favs));
+      setFavoriteProjects(new Set(projFavs));
     } catch (e) {
       setError(String(e));
     } finally {
@@ -48,7 +62,32 @@ export default function App() {
     window.setTimeout(() => setToast(null), 2200);
   }, []);
 
-  // Project groups for the sidebar.
+  // Drag the divider to resize the sidebar; persist the final width.
+  const onResizeStart = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = sidebarWidthRef.current;
+    let latest = startWidth;
+
+    const onMove = (ev: MouseEvent) => {
+      latest = clampSidebarWidth(startWidth + ev.clientX - startX);
+      setSidebarWidth(latest);
+    };
+    const onUp = () => {
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("mouseup", onUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+      saveSidebarWidth(latest);
+    };
+
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+  }, []);
+
+  // Project groups for the sidebar, favorited projects pinned to the top.
   const projects = useMemo<ProjectGroup[]>(() => {
     const map = new Map<string, ProjectGroup>();
     for (const s of sessions) {
@@ -63,8 +102,8 @@ export default function App() {
         });
       }
     }
-    return [...map.values()].sort((a, b) => a.label.localeCompare(b.label));
-  }, [sessions]);
+    return sortProjects([...map.values()], favoriteProjects);
+  }, [sessions, favoriteProjects]);
 
   const visible = useMemo(
     () => filterSortSessions(sessions, { search, filter, favorites, sortKey }),
@@ -82,6 +121,19 @@ export default function App() {
       }
     },
     [favorites, showToast],
+  );
+
+  const onToggleFavoriteProject = useCallback(
+    async (dir: string) => {
+      const willFavorite = !favoriteProjects.has(dir);
+      try {
+        const updated = await setFavoriteProject(dir, willFavorite);
+        setFavoriteProjects(new Set(updated));
+      } catch (e) {
+        showToast(`Failed to update project favorite: ${e}`);
+      }
+    },
+    [favoriteProjects, showToast],
   );
 
   const onRename = useCallback(
@@ -168,6 +220,17 @@ export default function App() {
           favoritesCount={favorites.size}
           filter={filter}
           onSelect={setFilter}
+          favoriteProjects={favoriteProjects}
+          onToggleFavoriteProject={onToggleFavoriteProject}
+          width={sidebarWidth}
+        />
+
+        <div
+          className="resizer"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label="Resize sidebar"
+          onMouseDown={onResizeStart}
         />
 
         <main className="content">

@@ -33,6 +33,17 @@ export function setFavorite(
   return invoke<string[]>("set_favorite", { sessionId, favorite });
 }
 
+export function getFavoriteProjects(): Promise<string[]> {
+  return invoke<string[]>("get_favorite_projects");
+}
+
+export function setFavoriteProject(
+  projectDir: string,
+  favorite: boolean,
+): Promise<string[]> {
+  return invoke<string[]>("set_favorite_project", { projectDir, favorite });
+}
+
 export function copyResumeCommand(sessionId: string): Promise<void> {
   return writeText(`claude --resume ${sessionId}`);
 }

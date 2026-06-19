@@ -17,6 +17,8 @@ import {
   openInVscode,
   getFavorites,
   setFavorite,
+  getFavoriteProjects,
+  setFavoriteProject,
   copyResumeCommand,
 } from "./api";
 
@@ -71,6 +73,22 @@ describe("api", () => {
       favorite: true,
     });
     expect(out).toEqual(["sid-1"]);
+  });
+
+  it("getFavoriteProjects invokes get_favorite_projects with no args", async () => {
+    invoke.mockResolvedValue(["-Users-me-alpha"]);
+    await expect(getFavoriteProjects()).resolves.toEqual(["-Users-me-alpha"]);
+    expect(invoke).toHaveBeenCalledWith("get_favorite_projects");
+  });
+
+  it("setFavoriteProject passes camelCase projectDir and favorite flag", async () => {
+    invoke.mockResolvedValue(["-Users-me-alpha"]);
+    const out = await setFavoriteProject("-Users-me-alpha", true);
+    expect(invoke).toHaveBeenCalledWith("set_favorite_project", {
+      projectDir: "-Users-me-alpha",
+      favorite: true,
+    });
+    expect(out).toEqual(["-Users-me-alpha"]);
   });
 
   it("copyResumeCommand writes the claude --resume command to the clipboard", async () => {

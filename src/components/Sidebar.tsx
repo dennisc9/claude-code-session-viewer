@@ -15,6 +15,11 @@ interface Props {
   favoritesCount: number;
   filter: Filter;
   onSelect: (f: Filter) => void;
+  /** Dirs of favorited projects, pinned to the top of the project list. */
+  favoriteProjects: Set<string>;
+  onToggleFavoriteProject: (dir: string) => void;
+  /** Current sidebar width in px (user-resizable). */
+  width: number;
 }
 
 function isActive(filter: Filter, target: Filter): boolean {
@@ -31,9 +36,12 @@ export function Sidebar({
   favoritesCount,
   filter,
   onSelect,
+  favoriteProjects,
+  onToggleFavoriteProject,
+  width,
 }: Props) {
   return (
-    <nav className="sidebar">
+    <nav className="sidebar" style={{ width }}>
       <div className="sidebar-section">
         <button
           className={`nav-item ${isActive(filter, { type: "all" }) ? "active" : ""}`}
@@ -53,19 +61,33 @@ export function Sidebar({
 
       <div className="sidebar-heading">Projects</div>
       <div className="sidebar-section scroll">
-        {projects.map((p) => (
-          <button
-            key={p.dir}
-            className={`nav-item ${
-              isActive(filter, { type: "project", dir: p.dir }) ? "active" : ""
-            }`}
-            onClick={() => onSelect({ type: "project", dir: p.dir })}
-            title={p.dir}
-          >
-            <span className="nav-label">{p.label}</span>
-            <span className="nav-count">{p.count}</span>
-          </button>
-        ))}
+        {projects.map((p) => {
+          const starred = favoriteProjects.has(p.dir);
+          return (
+            <div key={p.dir} className="project-row">
+              <button
+                className={`project-star star ${starred ? "starred" : ""}`}
+                title={starred ? "Unfavorite project" : "Favorite project"}
+                aria-label={starred ? "Unfavorite project" : "Favorite project"}
+                onClick={() => onToggleFavoriteProject(p.dir)}
+              >
+                {starred ? "★" : "☆"}
+              </button>
+              <button
+                className={`nav-item ${
+                  isActive(filter, { type: "project", dir: p.dir })
+                    ? "active"
+                    : ""
+                }`}
+                onClick={() => onSelect({ type: "project", dir: p.dir })}
+                title={p.label}
+              >
+                <span className="nav-label">{p.label}</span>
+                <span className="nav-count">{p.count}</span>
+              </button>
+            </div>
+          );
+        })}
       </div>
     </nav>
   );

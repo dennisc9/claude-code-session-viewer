@@ -8,8 +8,12 @@ const projects: ProjectGroup[] = [
   { dir: "-Users-me-beta", label: "beta", count: 1 },
 ];
 
-function setup(filter: Filter = { type: "all" }) {
+function setup(
+  filter: Filter = { type: "all" },
+  favoriteProjects: Set<string> = new Set(),
+) {
   const onSelect = vi.fn();
+  const onToggleFavoriteProject = vi.fn();
   render(
     <Sidebar
       projects={projects}
@@ -17,9 +21,12 @@ function setup(filter: Filter = { type: "all" }) {
       favoritesCount={2}
       filter={filter}
       onSelect={onSelect}
+      favoriteProjects={favoriteProjects}
+      onToggleFavoriteProject={onToggleFavoriteProject}
+      width={220}
     />,
   );
-  return { onSelect };
+  return { onSelect, onToggleFavoriteProject };
 }
 
 describe("Sidebar", () => {
@@ -59,6 +66,21 @@ describe("Sidebar", () => {
       type: "project",
       dir: "-Users-me-alpha",
     });
+  });
+
+  it("toggles a project favorite, passing the project dir", async () => {
+    const user = userEvent.setup();
+    const { onToggleFavoriteProject } = setup();
+    // The empty star next to the first project (alpha) favorites it.
+    await user.click(screen.getAllByLabelText("Favorite project")[0]);
+    expect(onToggleFavoriteProject).toHaveBeenCalledWith("-Users-me-alpha");
+  });
+
+  it("renders a filled star for an already-favorited project", () => {
+    setup({ type: "all" }, new Set(["-Users-me-alpha"]));
+    const stars = screen.getAllByLabelText("Unfavorite project");
+    expect(stars).toHaveLength(1);
+    expect(stars[0]).toHaveTextContent("★");
   });
 
   it("marks the active filter button with the active class", () => {

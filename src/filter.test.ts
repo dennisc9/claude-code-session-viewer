@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
-import { filterSortSessions, type FilterOptions } from "./filter";
+import { filterSortSessions, sortProjects, type FilterOptions } from "./filter";
+import type { ProjectGroup } from "./components/Sidebar";
 import { makeSession } from "./test/factory";
 
 const base: FilterOptions = {
@@ -92,5 +93,34 @@ describe("filterSortSessions", () => {
       search: "alpha",
     });
     expect(out.map((s) => s.id)).toEqual(["a"]);
+  });
+});
+
+describe("sortProjects", () => {
+  const projects: ProjectGroup[] = [
+    { dir: "-a", label: "apple", count: 1 },
+    { dir: "-b", label: "banana", count: 2 },
+    { dir: "-c", label: "cherry", count: 3 },
+  ];
+
+  it("sorts alphabetically by label when nothing is favorited", () => {
+    const out = sortProjects(projects, new Set());
+    expect(out.map((p) => p.dir)).toEqual(["-a", "-b", "-c"]);
+  });
+
+  it("pins favorited projects to the top, each group still alphabetical", () => {
+    const out = sortProjects(projects, new Set(["-c"]));
+    expect(out.map((p) => p.dir)).toEqual(["-c", "-a", "-b"]);
+  });
+
+  it("keeps favorites alphabetical among themselves", () => {
+    const out = sortProjects(projects, new Set(["-c", "-b"]));
+    expect(out.map((p) => p.dir)).toEqual(["-b", "-c", "-a"]);
+  });
+
+  it("does not mutate the input array", () => {
+    const snapshot = projects.map((p) => p.dir);
+    sortProjects(projects, new Set(["-c"]));
+    expect(projects.map((p) => p.dir)).toEqual(snapshot);
   });
 });

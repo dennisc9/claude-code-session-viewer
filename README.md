@@ -51,33 +51,44 @@ cd claude-code-session-viewer
 npm install
 
 # 3. Run the app (compiles the Rust backend + serves the UI, hot-reloads both)
-npm run tauri dev
+npm run app
 ```
 
-The first `tauri dev` run downloads and compiles the Rust dependencies, so it takes a few
-minutes; subsequent runs are fast.
+`npm run app` is the command you want for day-to-day development — it opens the app in a
+**native desktop window** with the Rust backend wired up and hot-reloads both Rust and the UI.
+The first run downloads and compiles the Rust dependencies, so it takes a few minutes;
+subsequent runs are fast.
+
+> ⚠️ **Don't open `localhost:1420` in a browser.** That's the frontend-only Vite dev server
+> (`npm run dev`); it has no Tauri backend, so every session load throws
+> `Cannot read properties of undefined (reading 'invoke')`. Always use the native window from
+> `npm run app`.
 
 ## Building a distributable app
 
 ```bash
-npm run tauri build
+npm run app:build
 ```
 
 The bundled `.app` and installer land in `src-tauri/target/release/bundle/`. Double-click the
 `.app` to run — no terminal needed.
 
-## Other scripts
+## Scripts
 
-| Command                | What it does                                                        |
-| ---------------------- | ------------------------------------------------------------------- |
-| `npm run tauri dev`    | Run the full desktop app with hot reload (use this for development). |
-| `npm run tauri build`  | Produce the bundled `.app` / installer.                              |
-| `npm run build`        | TypeScript typecheck + Vite build of the frontend only (no Rust).    |
-| `npm test`             | Run the frontend unit/component tests (Vitest).                      |
-| `cd src-tauri && cargo test` | Run the Rust backend tests.                                    |
+| Command             | What it does                                                            |
+| ------------------- | ---------------------------------------------------------------------- |
+| `npm run app`       | **Run the full desktop app** with hot reload (use this for development). |
+| `npm run app:build` | Produce the bundled `.app` / installer.                                 |
+| `npm test`          | Run the frontend unit/component tests (Vitest).                         |
+| `npm run typecheck` | TypeScript typecheck only (no build).                                   |
+| `npm run build`     | TypeScript typecheck + Vite build of the frontend only (no Rust).       |
+| `cd src-tauri && cargo test` | Run the Rust backend tests.                                   |
 
-> `npm run dev` starts the Vite dev server alone. The app's IPC calls fail without the Tauri
-> shell, so prefer `npm run tauri dev` for actual use.
+`npm run app` / `npm run app:build` are aliases for `npm run tauri dev` / `npm run tauri build`
+— use whichever you prefer.
+
+> `npm run dev` starts the Vite dev server alone (browser at `localhost:1420`). The app's IPC
+> calls fail without the Tauri shell, so use `npm run app` for actual use.
 
 ## How it works
 

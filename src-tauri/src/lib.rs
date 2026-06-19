@@ -301,6 +301,15 @@ fn favorites_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
     Ok(dir.join("favorites.json"))
 }
 
+fn favorite_projects_path(app: &tauri::AppHandle) -> Result<PathBuf, String> {
+    let dir = app
+        .path()
+        .app_data_dir()
+        .map_err(|e| e.to_string())?;
+    fs::create_dir_all(&dir).map_err(|e| e.to_string())?;
+    Ok(dir.join("favorite_projects.json"))
+}
+
 /// Read favorited session ids from a `favorites.json` at `path`. Missing or
 /// malformed files yield an empty set rather than an error.
 fn read_favorites(path: &Path) -> Result<Vec<String>, String> {
@@ -344,6 +353,23 @@ fn set_favorite(
     write_favorite(&favorites_path(&app)?, &session_id, favorite)
 }
 
+/// Read the set of favorited project dirs from app data.
+#[tauri::command]
+fn get_favorite_projects(app: tauri::AppHandle) -> Result<Vec<String>, String> {
+    read_favorites(&favorite_projects_path(&app)?)
+}
+
+/// Toggle a project's favorite state and persist the full set. The id is the
+/// raw `~/.claude/projects` subdirectory name (`Session.project_dir`).
+#[tauri::command]
+fn set_favorite_project(
+    app: tauri::AppHandle,
+    project_dir: String,
+    favorite: bool,
+) -> Result<Vec<String>, String> {
+    write_favorite(&favorite_projects_path(&app)?, &project_dir, favorite)
+}
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -355,7 +381,9 @@ pub fn run() {
             open_in_finder,
             open_in_vscode,
             get_favorites,
-            set_favorite
+            set_favorite,
+            get_favorite_projects,
+            set_favorite_project
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
