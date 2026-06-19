@@ -13,6 +13,7 @@ import {
 import type { Session, SortKey } from "./types";
 import { filterSortSessions, sortProjects } from "./filter";
 import { clampSidebarWidth, loadSidebarWidth, saveSidebarWidth } from "./layout";
+import iconUrl from "./assets/icon.png";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
 import "./App.css";
@@ -190,7 +191,10 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand">Claude Session Viewer</div>
+        <div className="brand">
+          <img className="brand-icon" src={iconUrl} alt="" />
+          Claude Session Viewer
+        </div>
         <input
           className="search"
           type="text"
