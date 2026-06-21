@@ -16,7 +16,7 @@ import { clampSidebarWidth, loadSidebarWidth, saveSidebarWidth } from "./layout"
 import iconUrl from "./assets/icon.png";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
-import { Search, ArrowUpDown, RefreshCw } from "lucide-react";
+import { Search, ArrowUpDown, RefreshCw, GripVertical } from "lucide-react";
 import "./App.css";
 
 export default function App() {
@@ -240,7 +240,9 @@ export default function App() {
           aria-orientation="vertical"
           aria-label="Resize sidebar"
           onMouseDown={onResizeStart}
-        />
+        >
+          <GripVertical className="resizer-grip" size={14} aria-hidden />
+        </div>
 
         <main className="content">
           {loading && <div className="state">Loading sessions…</div>}

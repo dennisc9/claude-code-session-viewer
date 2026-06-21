@@ -182,15 +182,44 @@ body {
 /* Draggable divider between the sidebar and the content area. The visible
    line is 1px but the hit target is wider for easier grabbing. */
 .resizer {
-  width: 5px;
+  width: 11px;
   flex-shrink: 0;
   cursor: col-resize;
+  background: transparent;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.resizer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
   background: var(--border);
   transition: background 0.12s ease;
 }
-.resizer:hover,
-.resizer:active {
-  background: var(--accent);
+.resizer:hover::before,
+.resizer:active::before {
+  background: var(--claude);
+}
+.resizer-grip {
+  position: relative;
+  color: var(--text-faint);
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+  background: var(--bg-elev-2);
+  border-radius: 4px;
+  padding: 2px 0;
+}
+.resizer:hover .resizer-grip,
+.resizer:active .resizer-grip {
+  opacity: 1;
+  color: var(--claude);
 }
 
 .sidebar {

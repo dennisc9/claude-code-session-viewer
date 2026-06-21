@@ -41,7 +41,7 @@ visible text for icons so role-based queries keep working.
   fill, active is the rounded macOS-blue pill (not full-bleed). Count chip on the right.
 - [x] **Sidebar icons** — `Star` (gold, filled when favorited) for Favorites and project rows;
   remove the `★/☆` glyphs. Project star still only appears on hover or when starred.
-- [ ] **Resizer hit area + grip** — keep the visible line 1px but widen the hit target; on
+- [x] **Resizer hit area + grip** — keep the visible line 1px but widen the hit target; on
   hover, reveal a centered `GripVertical` icon and tint the line coral. (Behavior in
   `layout.ts` is unchanged.)
 
