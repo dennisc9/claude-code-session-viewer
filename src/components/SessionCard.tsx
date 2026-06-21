@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Star, Pencil } from "lucide-react";
+import { Star, Pencil, LayoutGrid, Code2 } from "lucide-react";
 import type { Session } from "../types";
 import { formatModel, formatRelative, formatTokens } from "../format";
 
@@ -121,22 +121,27 @@ export function SessionCard({
       )}
 
       <div className="card-actions">
-        <button onClick={() => onResume(session)} title="Copy resume command">
-          Copy resume
+        <button
+          className="action-copy"
+          onClick={() => onResume(session)}
+          title="Copy resume command"
+          aria-label="Copy resume"
+        >
+          Copy <code className="cmd-chip">claude --resume</code>
         </button>
         <button
           onClick={() => onFinder(session)}
           disabled={!session.cwd}
           title={session.cwd ?? "No working directory"}
         >
-          Open Finder
+          <LayoutGrid size={13} aria-hidden /> Open Finder
         </button>
         <button
           onClick={() => onVscode(session)}
           disabled={!session.cwd}
           title={session.cwd ?? "No working directory"}
         >
-          Open VS Code
+          <Code2 size={13} aria-hidden /> Open VS Code
         </button>
       </div>
     </div>

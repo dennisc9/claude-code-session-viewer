@@ -484,6 +484,9 @@ body {
   margin-top: 10px;
 }
 .card-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: var(--bg-elev-2);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -491,15 +494,35 @@ body {
   padding: 5px 10px;
   font-size: 12px;
   cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .card-actions button:hover:not(:disabled) {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #fff;
+  background: var(--bg-hover);
+  border-color: #4a4a4a;
+  color: var(--text);
 }
 .card-actions button:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+.card-actions button.action-copy {
+  background: var(--claude-soft);
+  border-color: var(--claude-border);
+  color: var(--claude-text);
+}
+.card-actions button.action-copy:hover:not(:disabled) {
+  background: var(--claude);
+  border-color: var(--claude);
+  color: #fff;
+}
+.cmd-chip {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 11px;
+  color: var(--text);
 }
 
 /* ---------- Toast ---------- */

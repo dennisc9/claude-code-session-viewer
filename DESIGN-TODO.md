@@ -53,7 +53,7 @@ visible text for icons so role-based queries keep working.
   `Pencil` icon next to the title (still also reachable by clicking the title to edit).
 - [x] **Badges** — refine the model/token pills; tokens use the coral/accent text. Sub-line
   project label switched from blue to dim (matches reference).
-- [ ] **Action buttons** — `Copy` shows the command in a monospace inset chip
+- [x] **Action buttons** — `Copy` shows the command in a monospace inset chip
   ("Copy `claude --resume`"); `Open Finder` gets a `LayoutGrid` icon, `Open VS Code` a
   `Code2` icon. Coral hover on the primary Copy action; neutral hover on the others.
 
