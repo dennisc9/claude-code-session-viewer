@@ -43,6 +43,7 @@ Rules:
 
 ```bash
 npm run dev &
+DEV_PID=$!
 sleep 3
 ```
 
