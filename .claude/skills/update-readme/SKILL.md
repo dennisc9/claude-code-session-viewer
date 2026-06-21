@@ -155,7 +155,7 @@ Wait ~1 second for React to render, then use `mcp__plugin_chrome-devtools-mcp_ch
 ### 3d. Kill the dev server
 
 ```bash
-pkill -f "vite" || true
+kill "$DEV_PID" || true
 ```
 
 ## Step 4 — Verify
