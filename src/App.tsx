@@ -16,6 +16,7 @@ import { clampSidebarWidth, loadSidebarWidth, saveSidebarWidth } from "./layout"
 import iconUrl from "./assets/icon.png";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
+import { Search } from "lucide-react";
 import "./App.css";
 
 export default function App() {
@@ -195,13 +196,16 @@ export default function App() {
           <img className="brand-icon" src={iconUrl} alt="" />
           Claude Session Viewer
         </div>
-        <input
-          className="search"
-          type="text"
-          placeholder="Search name, first or last message…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="search-wrap">
+          <Search className="search-icon" size={15} aria-hidden />
+          <input
+            className="search"
+            type="text"
+            placeholder="Search name, first or last message…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <label className="sort">
           Sort:
           <select

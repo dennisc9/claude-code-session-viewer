@@ -24,7 +24,7 @@ visible text for icons so role-based queries keep working.
 
 ## Top bar
 
-- [ ] **Search field** — rounded pill (radius ~8px), inset left `Search` icon, softer
+- [x] **Search field** — rounded pill (radius ~8px), inset left `Search` icon, softer
   border, subtle focus ring. Slightly taller.
 - [ ] **Sort control** — restyle as a pill button group with an `ArrowUpDown` icon; keep the
   native `<select>` for behavior but visually present it as a pill ("Sort: Last active ⇅").
