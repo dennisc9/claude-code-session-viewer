@@ -37,7 +37,7 @@ visible text for icons so role-based queries keep working.
 
 - [x] **Clean-line look** — sidebar shares the content background (no elevated panel); the
   separation is the 1px resizer line only. Section heading + spacing refined.
-- [ ] **Rounded nav items** — items get horizontal margin + rounded corners; hover is a soft
+- [x] **Rounded nav items** — items get horizontal margin + rounded corners; hover is a soft
   fill, active is the rounded macOS-blue pill (not full-bleed). Count chip on the right.
 - [ ] **Sidebar icons** — `Star` (gold, filled when favorited) for Favorites and project rows;
   remove the `★/☆` glyphs. Project star still only appears on hover or when starred.

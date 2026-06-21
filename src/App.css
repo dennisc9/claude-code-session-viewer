@@ -229,11 +229,14 @@ body {
   background: transparent;
   border: none;
   color: var(--text-dim);
-  padding: 6px 14px;
+  margin: 1px 8px;
+  padding: 6px 8px;
+  border-radius: var(--nav-radius);
   font-size: 13px;
   text-align: left;
   cursor: pointer;
-  width: 100%;
+  width: auto;
+  align-self: stretch;
 }
 
 /* A project row: a star toggle plus the nav button (which fills the row). */
@@ -244,11 +247,13 @@ body {
 .project-row .nav-item {
   flex: 1;
   min-width: 0;
+  margin-left: 0;
   padding-left: 4px;
 }
 .project-row .project-star {
   font-size: 13px;
-  padding: 6px 4px 6px 14px;
+  padding: 6px 4px 6px 8px;
+  margin-left: 8px;
   flex-shrink: 0;
   visibility: hidden;
 }
@@ -257,11 +262,12 @@ body {
   visibility: visible;
 }
 .nav-item:hover {
-  background: var(--bg-hover);
+  background: var(--nav-hover);
+  color: var(--text);
 }
 .nav-item.active {
-  background: var(--accent);
-  color: #fff;
+  background: var(--nav-active);
+  color: var(--nav-active-text);
 }
 .nav-label {
   overflow: hidden;
@@ -274,7 +280,7 @@ body {
   flex-shrink: 0;
 }
 .nav-item.active .nav-count {
-  color: #cfe6ff;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 /* ---------- Content / cards ---------- */
