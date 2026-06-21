@@ -35,7 +35,7 @@ visible text for icons so role-based queries keep working.
 
 ## Sidebar
 
-- [ ] **Clean-line look** — sidebar shares the content background (no elevated panel); the
+- [x] **Clean-line look** — sidebar shares the content background (no elevated panel); the
   separation is the 1px resizer line only. Section heading + spacing refined.
 - [ ] **Rounded nav items** — items get horizontal margin + rounded corners; hover is a soft
   fill, active is the rounded macOS-blue pill (not full-bleed). Count chip on the right.
