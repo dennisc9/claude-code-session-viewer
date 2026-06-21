@@ -26,7 +26,7 @@ visible text for icons so role-based queries keep working.
 
 - [x] **Search field** — rounded pill (radius ~8px), inset left `Search` icon, softer
   border, subtle focus ring. Slightly taller.
-- [ ] **Sort control** — restyle as a pill button group with an `ArrowUpDown` icon; keep the
+- [x] **Sort control** — restyle as a pill button group with an `ArrowUpDown` icon; keep the
   native `<select>` for behavior but visually present it as a pill ("Sort: Last active ⇅").
 - [ ] **Refresh button** — coral-tinted icon button using Lucide `RefreshCw` instead of the
   `⟳` glyph; coral hover.

@@ -120,17 +120,31 @@ body {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: var(--text-dim);
-  white-space: nowrap;
-}
-.sort select {
   background: var(--bg-elev-2);
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 8px;
+  padding: 5px 10px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  transition: border-color 0.15s ease;
+}
+.sort:hover {
+  border-color: var(--text-faint);
+}
+.sort select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: none;
   color: var(--text);
-  padding: 5px 6px;
+  font-weight: 500;
   font-size: 13px;
+  cursor: pointer;
   outline: none;
+  padding: 0;
+}
+.sort-icon {
+  color: var(--text-faint);
 }
 
 .refresh {
