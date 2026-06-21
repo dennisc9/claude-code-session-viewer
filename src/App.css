@@ -14,6 +14,19 @@
   --star: #e2c08d;
   --danger: #f48771;
 
+  /* Claude coral accent */
+  --claude: #d97757;
+  --claude-hover: #e08868;
+  --claude-text: #e0a890;        /* lighter coral for text/badges on dark bg */
+  --claude-soft: rgba(217, 119, 87, 0.14);  /* tinted fill for coral buttons */
+  --claude-border: rgba(217, 119, 87, 0.45);
+
+  /* Sidebar nav */
+  --nav-radius: 6px;
+  --nav-hover: rgba(255, 255, 255, 0.06);   /* soft hover fill */
+  --nav-active: #2f6fed;                      /* macOS-style selection blue */
+  --nav-active-text: #ffffff;
+
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", sans-serif;
   font-size: 13px;

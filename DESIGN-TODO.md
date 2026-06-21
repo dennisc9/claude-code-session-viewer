@@ -17,7 +17,7 @@ visible text for icons so role-based queries keep working.
 ## Foundation
 
 - [x] Add `lucide-react` dependency.
-- [ ] **Design tokens** — add a Claude coral accent (`--claude: #d97757` family) for the
+- [x] **Design tokens** — add a Claude coral accent (`--claude: #d97757` family) for the
   refresh button, Copy-resume button, and brand mark; keep macOS blue (`--accent`) for the
   sidebar active selection only. Add sidebar tokens (rounded item radius, hover/active fills).
   Define them in `:root` in `App.css`; don't hardcode hex elsewhere.
