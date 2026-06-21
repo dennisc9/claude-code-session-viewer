@@ -251,6 +251,8 @@ body {
   padding-left: 4px;
 }
 .project-row .project-star {
+  display: inline-flex;
+  align-items: center;
   font-size: 13px;
   padding: 6px 4px 6px 8px;
   margin-left: 8px;
@@ -273,6 +275,11 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-right: auto;
+}
+.fav-star {
+  color: var(--star);
+  flex-shrink: 0;
 }
 .nav-count {
   font-size: 11px;
