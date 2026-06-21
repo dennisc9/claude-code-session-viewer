@@ -1,6 +1,7 @@
 ---
 name: update-readme
 description: Proactively update README.md after any user-facing feature addition, UI change, command/script change, or dependency change. Use this automatically at the end of any session where new functionality was added or existing features were modified. Covers the "What it does" bullet list, Scripts table, Getting started/requirements, and docs/screenshot.png (retaken only when a UI change is visible on screen).
+model: sonnet
 ---
 
 # Update README
@@ -12,7 +13,7 @@ Run this automatically at the end of any session where a user-facing feature, UI
 Read the files that changed in this session and cross-reference against the current README:
 
 ```bash
-git diff HEAD -- README.md src/App.tsx src/App.css src/api.ts src/types.ts package.json src-tauri/src/lib.rs
+git diff HEAD
 ```
 
 Then read `README.md` to see what's currently documented.
