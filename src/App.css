@@ -146,8 +146,24 @@ body {
   outline: none;
   padding: 0;
 }
-.sort-icon {
+.sort-dir {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 2px;
+  margin: -2px -2px -2px 0;
+  border-radius: 5px;
   color: var(--text-faint);
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    background 0.15s ease;
+}
+.sort-dir:hover {
+  color: var(--text);
+  background: var(--bg-hover);
 }
 
 .refresh {
