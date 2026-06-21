@@ -53,6 +53,10 @@ When you change something, run the matching suite: touch `lib.rs` → `cargo tes
 - **Always dark** (VSCode dark theme), not OS-adaptive. Styling is plain CSS in `src/App.css`.
 - The dev server is pinned to port **1420** (`strictPort`) — Tauri requires it.
 
+## README updates
+
+After any session that adds a user-visible feature, UI element, new npm script, or dependency change, run the `/update-readme` skill. It updates the "What it does" bullet list, Scripts table, and Getting started section, and retakes `docs/screenshot.png` with canonical mock data when the UI changed. Skip it for test-only or backend-only refactors with no visible effect.
+
 ## Repository etiquette
 
 - Default branch is `main`. Branch before committing; only commit or push when asked.
