@@ -16,3 +16,4 @@ export interface Session {
 }
 
 export type SortKey = "lastActive" | "created";
+export type SortDir = "desc" | "asc";

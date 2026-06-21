@@ -1,6 +1,6 @@
 /** Pure filter/sort/search logic for the session list, extracted from App.tsx
  *  so it can be unit-tested without rendering the component. */
-import type { Session, SortKey } from "./types";
+import type { Session, SortKey, SortDir } from "./types";
 import type { Filter, ProjectGroup } from "./components/Sidebar";
 
 /** Order the sidebar projects: favorited ones first (each group keeping its
@@ -25,15 +25,17 @@ export interface FilterOptions {
   filter: Filter;
   /** Set of favorited session ids. */
   favorites: Set<string>;
-  /** Which timestamp to sort by; always newest-first. */
+  /** Which timestamp to sort by. */
   sortKey: SortKey;
+  /** Sort direction: "desc" = newest first (default), "asc" = oldest first. */
+  sortDir: SortDir;
 }
 
 /** Apply the favorites/project filter, the search query, and the sort.
  *  Returns a new array; the input is never mutated. */
 export function filterSortSessions(
   sessions: Session[],
-  { search, filter, favorites, sortKey }: FilterOptions,
+  { search, filter, favorites, sortKey, sortDir }: FilterOptions,
 ): Session[] {
   const q = search.trim().toLowerCase();
   let list = sessions;
@@ -57,6 +59,7 @@ export function filterSortSessions(
   return [...list].sort((a, b) => {
     const av = (sortKey === "created" ? a.created : a.lastActive) ?? "";
     const bv = (sortKey === "created" ? b.created : b.lastActive) ?? "";
-    return bv.localeCompare(av); // newest first
+    const cmp = bv.localeCompare(av); // newest first
+    return sortDir === "asc" ? -cmp : cmp;
   });
 }

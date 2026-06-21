@@ -35,7 +35,7 @@ describe("Sidebar", () => {
   it("renders the All and Favorites counts", () => {
     setup();
     expect(screen.getByText("All sessions").parentElement).toHaveTextContent("4");
-    expect(screen.getByText("★ Favorites").parentElement).toHaveTextContent("2");
+    expect(screen.getByText("Favorites").closest("button")).toHaveTextContent("2");
   });
 
   it("renders one nav item per project with its count", () => {
@@ -54,7 +54,7 @@ describe("Sidebar", () => {
   it("calls onSelect with the favorites filter", async () => {
     const user = userEvent.setup();
     const { onSelect } = setup();
-    await user.click(screen.getByText("★ Favorites"));
+    await user.click(screen.getByText("Favorites"));
     expect(onSelect).toHaveBeenCalledWith({ type: "favorites" });
   });
 
@@ -80,7 +80,7 @@ describe("Sidebar", () => {
     setup({ type: "all" }, new Set(["-Users-me-alpha"]));
     const stars = screen.getAllByLabelText("Unfavorite project");
     expect(stars).toHaveLength(1);
-    expect(stars[0]).toHaveTextContent("★");
+    expect(stars[0]).toHaveClass("starred");
   });
 
   it("marks the active filter button with the active class", () => {

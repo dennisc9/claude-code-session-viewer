@@ -10,12 +10,13 @@ import {
   setFavorite,
   setFavoriteProject,
 } from "./api";
-import type { Session, SortKey } from "./types";
+import type { Session, SortKey, SortDir } from "./types";
 import { filterSortSessions, sortProjects } from "./filter";
 import { clampSidebarWidth, loadSidebarWidth, saveSidebarWidth } from "./layout";
 import iconUrl from "./assets/icon.png";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
+import { Search, ArrowUp, ArrowDown, RefreshCw, GripVertical } from "lucide-react";
 import "./App.css";
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>({ type: "all" });
   const [sortKey, setSortKey] = useState<SortKey>("lastActive");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [sidebarWidth, setSidebarWidth] = useState(loadSidebarWidth);
   const sidebarWidthRef = useRef(sidebarWidth);
   sidebarWidthRef.current = sidebarWidth;
@@ -107,8 +109,8 @@ export default function App() {
   }, [sessions, favoriteProjects]);
 
   const visible = useMemo(
-    () => filterSortSessions(sessions, { search, filter, favorites, sortKey }),
-    [sessions, favorites, filter, search, sortKey],
+    () => filterSortSessions(sessions, { search, filter, favorites, sortKey, sortDir }),
+    [sessions, favorites, filter, search, sortKey, sortDir],
   );
 
   const onToggleFavorite = useCallback(
@@ -195,13 +197,16 @@ export default function App() {
           <img className="brand-icon" src={iconUrl} alt="" />
           Claude Session Viewer
         </div>
-        <input
-          className="search"
-          type="text"
-          placeholder="Search name, first or last message…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+        <div className="search-wrap">
+          <Search className="search-icon" size={15} aria-hidden />
+          <input
+            className="search"
+            type="text"
+            placeholder="Search name, first or last message…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
         <label className="sort">
           Sort:
           <select
@@ -211,9 +216,31 @@ export default function App() {
             <option value="lastActive">Last active</option>
             <option value="created">Created</option>
           </select>
+          <button
+            type="button"
+            className="sort-dir"
+            onClick={() => setSortDir((d) => (d === "desc" ? "asc" : "desc"))}
+            title={sortDir === "desc" ? "Newest first" : "Oldest first"}
+            aria-label={
+              sortDir === "desc"
+                ? "Sorting newest first; click to sort oldest first"
+                : "Sorting oldest first; click to sort newest first"
+            }
+          >
+            {sortDir === "desc" ? (
+              <ArrowDown size={13} aria-hidden />
+            ) : (
+              <ArrowUp size={13} aria-hidden />
+            )}
+          </button>
         </label>
-        <button className="refresh" onClick={load} title="Reload sessions">
-          ⟳
+        <button
+          className="refresh"
+          onClick={load}
+          title="Reload sessions"
+          aria-label="Reload sessions"
+        >
+          <RefreshCw size={15} aria-hidden />
         </button>
       </header>
 
@@ -235,7 +262,9 @@ export default function App() {
           aria-orientation="vertical"
           aria-label="Resize sidebar"
           onMouseDown={onResizeStart}
-        />
+        >
+          <GripVertical className="resizer-grip" size={14} aria-hidden />
+        </div>
 
         <main className="content">
           {loading && <div className="state">Loading sessions…</div>}

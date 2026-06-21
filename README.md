@@ -25,7 +25,7 @@ and gives you a fast UI on top of them:
 - **Rename** a session inline (writes an `ai-title` entry to the JSONL, exactly like
   `claude /rename`).
 - **Copy resume command** — puts `claude --resume <id>` on your clipboard.
-- **Open in VS Code** — opens the session's working directory.
+- **Open in Finder** or **VS Code** — opens the session's working directory.
 - **Favorite** sessions with a star (persisted in the app's data directory).
 
 It's a viewer/manager, not a conversation reader — see [`PLAN.md`](PLAN.md) for scope.

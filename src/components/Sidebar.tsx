@@ -1,3 +1,5 @@
+import { Star } from "lucide-react";
+
 export interface ProjectGroup {
   dir: string;
   label: string;
@@ -54,7 +56,8 @@ export function Sidebar({
           className={`nav-item ${isActive(filter, { type: "favorites" }) ? "active" : ""}`}
           onClick={() => onSelect({ type: "favorites" })}
         >
-          <span className="nav-label">★ Favorites</span>
+          <Star size={14} fill="currentColor" className="fav-star" aria-hidden />
+          <span className="nav-label">Favorites</span>
           <span className="nav-count">{favoritesCount}</span>
         </button>
       </div>
@@ -71,7 +74,7 @@ export function Sidebar({
                 aria-label={starred ? "Unfavorite project" : "Favorite project"}
                 onClick={() => onToggleFavoriteProject(p.dir)}
               >
-                {starred ? "★" : "☆"}
+                <Star size={13} fill={starred ? "currentColor" : "none"} aria-hidden />
               </button>
               <button
                 className={`nav-item ${

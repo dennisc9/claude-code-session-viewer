@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Star, Pencil, LayoutGrid, Code2 } from "lucide-react";
 import type { Session } from "../types";
 import { formatModel, formatRelative, formatTokens } from "../format";
 
@@ -53,9 +54,10 @@ export function SessionCard({
         <button
           className={`star ${isFavorite ? "starred" : ""}`}
           title={isFavorite ? "Unfavorite" : "Favorite"}
+          aria-label={isFavorite ? "Unfavorite" : "Favorite"}
           onClick={() => onToggleFavorite(session)}
         >
-          {isFavorite ? "★" : "☆"}
+          <Star size={16} fill={isFavorite ? "currentColor" : "none"} aria-hidden />
         </button>
 
         {editing ? (
@@ -78,6 +80,12 @@ export function SessionCard({
           >
             {title}
           </span>
+        )}
+
+        {!editing && (
+          <button className="rename-btn" onClick={startEdit} title="Rename">
+            <Pencil size={12} aria-hidden /> Rename
+          </button>
         )}
 
         <div className="card-meta-right">
@@ -114,24 +122,28 @@ export function SessionCard({
       )}
 
       <div className="card-actions">
-        <button onClick={() => onResume(session)} title="Copy resume command">
-          Copy resume
+        <button
+          className="action-copy"
+          onClick={() => onResume(session)}
+          title="Copy resume command"
+          aria-label="Copy resume"
+        >
+          Copy <code className="cmd-chip">claude --resume</code>
         </button>
         <button
           onClick={() => onFinder(session)}
           disabled={!session.cwd}
           title={session.cwd ?? "No working directory"}
         >
-          Open Finder
+          <LayoutGrid size={13} aria-hidden /> Open Finder
         </button>
         <button
           onClick={() => onVscode(session)}
           disabled={!session.cwd}
           title={session.cwd ?? "No working directory"}
         >
-          Open VS Code
+          <Code2 size={13} aria-hidden /> Open VS Code
         </button>
-        <button onClick={startEdit}>Rename</button>
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ const base: FilterOptions = {
   filter: { type: "all" },
   favorites: new Set<string>(),
   sortKey: "lastActive",
+  sortDir: "desc",
 };
 
 describe("filterSortSessions", () => {
@@ -23,6 +24,32 @@ describe("filterSortSessions", () => {
     const a = makeSession({ id: "a", created: "2026-05-01T00:00:00Z" });
     const b = makeSession({ id: "b", created: "2026-01-01T00:00:00Z" });
     const out = filterSortSessions([a, b], { ...base, sortKey: "created" });
+    expect(out.map((s) => s.id)).toEqual(["a", "b"]);
+  });
+
+  it("reverses to oldest-first when sortDir is asc", () => {
+    const a = makeSession({ id: "a", lastActive: "2026-01-01T00:00:00Z" });
+    const b = makeSession({ id: "b", lastActive: "2026-03-01T00:00:00Z" });
+    const c = makeSession({ id: "c", lastActive: "2026-02-01T00:00:00Z" });
+    const out = filterSortSessions([a, b, c], { ...base, sortDir: "asc" });
+    expect(out.map((s) => s.id)).toEqual(["a", "c", "b"]);
+  });
+
+  it("respects sortDir asc when sorting by created", () => {
+    const a = makeSession({ id: "a", created: "2026-05-01T00:00:00Z" });
+    const b = makeSession({ id: "b", created: "2026-01-01T00:00:00Z" });
+    const out = filterSortSessions([a, b], {
+      ...base,
+      sortKey: "created",
+      sortDir: "asc",
+    });
+    expect(out.map((s) => s.id)).toEqual(["b", "a"]);
+  });
+
+  it("places a missing sort timestamp first when sorting ascending", () => {
+    const a = makeSession({ id: "a", lastActive: null });
+    const b = makeSession({ id: "b", lastActive: "2026-01-01T00:00:00Z" });
+    const out = filterSortSessions([a, b], { ...base, sortDir: "asc" });
     expect(out.map((s) => s.id)).toEqual(["a", "b"]);
   });
 
