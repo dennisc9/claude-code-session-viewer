@@ -59,4 +59,4 @@ visible text for icons so role-based queries keep working.
 
 ## Wrap-up
 
-- [ ] Run `/update-readme` (UI changed → retake `docs/screenshot.png` with mock data).
+- [x] Run `/update-readme` (UI changed → retake `docs/screenshot.png` with mock data).
