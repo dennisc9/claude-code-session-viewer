@@ -362,13 +362,34 @@ body {
   background: none;
   border: none;
   color: var(--text-faint);
-  font-size: 16px;
   cursor: pointer;
   padding: 0;
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .star.starred {
   color: var(--star);
+}
+
+.rename-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-dim);
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+.rename-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text);
 }
 
 .card-title {
@@ -376,7 +397,8 @@ body {
   font-size: 14px;
   color: var(--text);
   cursor: text;
-  flex: 1;
+  flex: 0 1 auto;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

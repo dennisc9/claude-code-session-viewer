@@ -49,7 +49,7 @@ visible text for icons so role-based queries keep working.
 
 - [x] **Card surface** — slightly larger radius/padding, calmer border, subtle hover lift to
   match the reference's roomier cards.
-- [ ] **Title row** — `Star` (gold) toggle; inline **Rename** as a small pill button with a
+- [x] **Title row** — `Star` (gold) toggle; inline **Rename** as a small pill button with a
   `Pencil` icon next to the title (still also reachable by clicking the title to edit).
 - [ ] **Badges** — refine the model/token pills; tokens use the coral/accent text. Sub-line
   project label switched from blue to dim (matches reference).

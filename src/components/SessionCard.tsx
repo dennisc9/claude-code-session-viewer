@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Star, Pencil } from "lucide-react";
 import type { Session } from "../types";
 import { formatModel, formatRelative, formatTokens } from "../format";
 
@@ -55,7 +56,7 @@ export function SessionCard({
           title={isFavorite ? "Unfavorite" : "Favorite"}
           onClick={() => onToggleFavorite(session)}
         >
-          {isFavorite ? "★" : "☆"}
+          <Star size={16} fill={isFavorite ? "currentColor" : "none"} aria-hidden />
         </button>
 
         {editing ? (
@@ -78,6 +79,12 @@ export function SessionCard({
           >
             {title}
           </span>
+        )}
+
+        {!editing && (
+          <button className="rename-btn" onClick={startEdit} title="Rename">
+            <Pencil size={12} aria-hidden /> Rename
+          </button>
         )}
 
         <div className="card-meta-right">
@@ -131,7 +138,6 @@ export function SessionCard({
         >
           Open VS Code
         </button>
-        <button onClick={startEdit}>Rename</button>
       </div>
     </div>
   );
