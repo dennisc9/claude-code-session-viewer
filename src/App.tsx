@@ -16,7 +16,7 @@ import { clampSidebarWidth, loadSidebarWidth, saveSidebarWidth } from "./layout"
 import iconUrl from "./assets/icon.png";
 import { Sidebar, type Filter, type ProjectGroup } from "./components/Sidebar";
 import { SessionCard } from "./components/SessionCard";
-import { Search, ArrowUpDown } from "lucide-react";
+import { Search, ArrowUpDown, RefreshCw } from "lucide-react";
 import "./App.css";
 
 export default function App() {
@@ -218,7 +218,7 @@ export default function App() {
           <ArrowUpDown className="sort-icon" size={13} aria-hidden />
         </label>
         <button className="refresh" onClick={load} title="Reload sessions">
-          ⟳
+          <RefreshCw size={15} aria-hidden />
         </button>
       </header>
 

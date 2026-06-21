@@ -148,17 +148,25 @@ body {
 }
 
 .refresh {
-  background: var(--bg-elev-2);
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--claude-soft);
+  border: 1px solid var(--claude-border);
+  border-radius: 8px;
+  color: var(--claude-text);
   width: 30px;
   height: 30px;
-  font-size: 15px;
   cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
 }
 .refresh:hover {
-  background: var(--bg-hover);
+  background: var(--claude);
+  border-color: var(--claude);
+  color: #fff;
 }
 
 /* ---------- Body / sidebar ---------- */

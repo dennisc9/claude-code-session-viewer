@@ -28,7 +28,7 @@ visible text for icons so role-based queries keep working.
   border, subtle focus ring. Slightly taller.
 - [x] **Sort control** — restyle as a pill button group with an `ArrowUpDown` icon; keep the
   native `<select>` for behavior but visually present it as a pill ("Sort: Last active ⇅").
-- [ ] **Refresh button** — coral-tinted icon button using Lucide `RefreshCw` instead of the
+- [x] **Refresh button** — coral-tinted icon button using Lucide `RefreshCw` instead of the
   `⟳` glyph; coral hover.
 - [ ] **Brand mark** — tighten spacing/weight so the icon + "Claude Session Viewer" reads as
   one clean lockup.
