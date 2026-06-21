@@ -30,7 +30,7 @@ visible text for icons so role-based queries keep working.
   native `<select>` for behavior but visually present it as a pill ("Sort: Last active ⇅").
 - [x] **Refresh button** — coral-tinted icon button using Lucide `RefreshCw` instead of the
   `⟳` glyph; coral hover.
-- [ ] **Brand mark** — tighten spacing/weight so the icon + "Claude Session Viewer" reads as
+- [x] **Brand mark** — tighten spacing/weight so the icon + "Claude Session Viewer" reads as
   one clean lockup.
 
 ## Sidebar
