@@ -234,7 +234,12 @@ export default function App() {
             )}
           </button>
         </label>
-        <button className="refresh" onClick={load} title="Reload sessions">
+        <button
+          className="refresh"
+          onClick={load}
+          title="Reload sessions"
+          aria-label="Reload sessions"
+        >
           <RefreshCw size={15} aria-hidden />
         </button>
       </header>

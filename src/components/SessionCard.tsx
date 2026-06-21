@@ -54,6 +54,7 @@ export function SessionCard({
         <button
           className={`star ${isFavorite ? "starred" : ""}`}
           title={isFavorite ? "Unfavorite" : "Favorite"}
+          aria-label={isFavorite ? "Unfavorite" : "Favorite"}
           onClick={() => onToggleFavorite(session)}
         >
           <Star size={16} fill={isFavorite ? "currentColor" : "none"} aria-hidden />

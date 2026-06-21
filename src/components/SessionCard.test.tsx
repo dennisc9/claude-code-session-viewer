@@ -51,7 +51,7 @@ describe("SessionCard", () => {
   it("calls onToggleFavorite when the star is clicked", async () => {
     const user = userEvent.setup();
     const { onToggleFavorite, session } = setup();
-    await user.click(screen.getByTitle("Favorite"));
+    await user.click(screen.getByRole("button", { name: "Favorite" }));
     expect(onToggleFavorite).toHaveBeenCalledWith(session);
   });
 
