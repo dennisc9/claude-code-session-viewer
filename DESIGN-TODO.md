@@ -47,7 +47,7 @@ visible text for icons so role-based queries keep working.
 
 ## Session cards
 
-- [ ] **Card surface** — slightly larger radius/padding, calmer border, subtle hover lift to
+- [x] **Card surface** — slightly larger radius/padding, calmer border, subtle hover lift to
   match the reference's roomier cards.
 - [ ] **Title row** — `Star` (gold) toggle; inline **Rename** as a small pill button with a
   `Pencil` icon next to the title (still also reachable by clicking the title to edit).
