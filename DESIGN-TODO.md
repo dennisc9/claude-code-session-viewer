@@ -51,7 +51,7 @@ visible text for icons so role-based queries keep working.
   match the reference's roomier cards.
 - [x] **Title row** — `Star` (gold) toggle; inline **Rename** as a small pill button with a
   `Pencil` icon next to the title (still also reachable by clicking the title to edit).
-- [ ] **Badges** — refine the model/token pills; tokens use the coral/accent text. Sub-line
+- [x] **Badges** — refine the model/token pills; tokens use the coral/accent text. Sub-line
   project label switched from blue to dim (matches reference).
 - [ ] **Action buttons** — `Copy` shows the command in a monospace inset chip
   ("Copy `claude --resume`"); `Open Finder` gets a `LayoutGrid` icon, `Open VS Code` a

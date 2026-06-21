@@ -429,14 +429,14 @@ body {
 .badge {
   background: var(--bg-elev-2);
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 2px 8px;
   font-size: 11px;
   color: var(--text-dim);
   white-space: nowrap;
 }
 .badge.tokens {
-  color: var(--accent-text);
+  color: var(--claude-text);
 }
 
 .card-sub {
@@ -448,7 +448,8 @@ body {
   font-size: 12px;
 }
 .project-label {
-  color: var(--accent-text);
+  color: var(--text-dim);
+  font-weight: 500;
 }
 .dot {
   color: var(--text-faint);
